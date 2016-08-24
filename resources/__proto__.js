@@ -20,7 +20,7 @@ module.exports = Object.assign( { }, require('../lib/MyObject'), {
         this.callChain = new Promise( resolve => start = resolve );
 
         ( this[ method ] ) 
-            ? this[ method ].forEach( fun => this.callChain = this.callChain.then( result => fun.call( this, result ) ) )
+            ? this.callChain = this.callChain.then( () => this[ method ].call( this ) )
             : [ this.Validate.apply, this.Context.apply, this.Db.apply, this.Response.apply ]
               .forEach( fun => this.callChain = this.callChain.then( result => fun( this, result ) ) )
 

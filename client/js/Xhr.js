@@ -13,11 +13,11 @@ module.exports = Object.create( Object.assign( {}, require('../../lib/MyObject')
             if( data.method === "get" ) {
                 let qs = data.qs ? `?${data.qs}` : '' 
                 req.open( data.method, `/${data.resource}${qs}` )
-                this.setHeaders(req)
+                this.setHeaders( req, data.headers )
                 req.send(null)
             } else {
                 req.open( data.method, `/${data.resource}`, true)
-                this.setHeaders(req)
+                this.setHeaders( req data.headers )
                 req.send( data.data )
             }
             
@@ -30,8 +30,8 @@ module.exports = Object.create( Object.assign( {}, require('../../lib/MyObject')
             return sText.replace(/[\s\=\\]/g, "\\$&");
         },
 
-        setHeaders( req ) {
-            req.setRequestHeader("Accept", 'application/json' )
+        setHeaders( req, headers={} ) {
+            req.setRequestHeader( "Accept", headers.accept || 'application/json' )
             req.setRequestHeader("Content-Type", 'text/plain' )
         }
     },

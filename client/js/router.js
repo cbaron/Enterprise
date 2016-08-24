@@ -35,14 +35,14 @@ module.exports = new (
                         .then( this.goHome() )
                     )
                 
-                Promise.all( Object.keys( this.views ).map( view => this.views[ view ].hide() ) )
-                .then( () => {
-                    if( this.views[ resource ] ) return this.views[ resource ].show()
-                    this.views[ resource ] =
-                        this.ViewFactory.create( resource, { insertion: { value: { $el: this.contentContainer } } } )
-                            .on( 'route', route => this.navigate( route, { trigger: true } ) )
-                } )
-                .catch( this.Error )
+                if( this.views.home ) return this.views[ resource ].route( resource )
+                
+                return Promise.resolve(
+                    this.views.home =
+                        this.ViewFactory.create( home, {
+                            insertion: { value: { $el: this.contentContainer } },
+                            resource: resource
+                        } ) )
                
             } ).catch( this.Error )
             

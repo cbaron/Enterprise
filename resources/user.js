@@ -1,11 +1,16 @@
-module.exports = Object.assign( { }, require('./__proto__'), {
+var proto = require('./__proto__')
 
-    DELETE: [ function() { return this.notFound() } ],
+module.exports = Object.assign( { }, proto, {
 
-    GET: [ function() { return this.Validate.apply( this ) }, function() { return this.respond( { body: this.user } ) } ],
+    DELETE: proto.notFound,
 
-    PATCH: [ function() { return this.notFound() }, ],
+    GET() {
+        return this.Validate.parseSignature( this, this.Validate.parseCookies( this.request.headers.cookie ) )
+        .then( () => this.respond( { body: this.user } ) )
+    },
 
-    POST: [ function() { return this.notFound() } ]
+    PATCH: proto.notFound,
+
+    POST: proto.notFound
 
 } )

@@ -1,1 +1,4 @@
-module.exports = ( p ) => `<div>Future Days</div>`
+module.exports = ( p ) => `<div>
+    <div data-js="name"></div>
+    <div data-js="items"></div>
+</div>`

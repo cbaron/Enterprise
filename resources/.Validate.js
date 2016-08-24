@@ -10,6 +10,10 @@ module.exports = Object.create( {
         if( resource.path.length > 1 && Number.isNaN( parseInt( resource.path[1], 10 ) ) ) this.throwInvalid()
         
         return this.parseSignature( resource, this.parseCookies( resource.request.headers.cookie ) )
+        .then( () =>
+            Object.keys( resource.user ).length === 0
+                ? this.respond( { stopChain: true, code: 401, body: { error: 'No user' } } )
+                : Promise.resolve() )
     },
 
     PATCH( resource ) {
@@ -58,17 +62,18 @@ module.exports = Object.create( {
     },
 
     parseSignature( resource, signature ) {
-        return new Promise( ( resolve, reject ) => {
-            if( ! signature ) { resource.user = { }; return resolve() }
+        return new Promise( resolve => {
+            var done = () => { resource.user = { }; return resolve() }
+            if( ! signature ) return done()
             require('jws').createVerify( {
                 algorithm: "HS256",
                 key: process.env.JWS_SECRET,
                 signature,
             } ).on( 'done', ( verified, obj ) => {
-                if( ! verified ) reject( 'Invalid Signature' )
+                if( ! verified ) return done()
                 resource.user = obj.payload
                 resolve()
-            } ).on( 'error', e => { resource.user = { }; return resolve() } )
+            } ).on( 'error', e => { resource.Error( e.stack || e ); done() } )
         } )
     },
 
