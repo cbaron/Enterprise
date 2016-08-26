@@ -11,8 +11,8 @@ module.exports = Object.assign( {}, require('./__proto__'), {
                         validate: function( val ) { return this.emailRegex.test(val) }
                     }, {
                         name: 'password',
-                        type: 'password',
                         error: 'Passwords must be at least 6 characters long.',
+                        type: 'password',
                         validate: val => val.length >= 6
                     } ]
                 },

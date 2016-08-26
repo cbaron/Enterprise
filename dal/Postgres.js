@@ -26,13 +26,13 @@ module.exports = Object.create( Object.assign( {}, require('../lib/MyObject').pr
         } )
 
         this.querySync( this._queries.selectForeignKeys() ).forEach( row => {
-            var match = /FOREIGN KEY \((\w+)\) REFERENCES (\w+)\((\w+)\)/.exec( row.pg_get_constraintdef )
+            var match = /FOREIGN KEY \("?(\w+)"?\) REFERENCES (\w+)\((\w+)\)/.exec( row.pg_get_constraintdef )
                 column = this.tables[ row.tablefrom ].columns.find( column => column.name === match[1] )
             
             column.fk = {
                 table: match[2],
                 column: match[3],
-                recorddescriptor: ( this.tables[ match[2] ].meta ) ? this.tables[ match[2] ].meta.recorddescriptor : null
+                recordType: ( this.tables[ match[2] ].meta ) ? this.tables[ match[2] ].meta.recordType : null
             }
         } )
     },

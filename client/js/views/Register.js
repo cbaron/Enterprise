@@ -16,13 +16,13 @@ module.exports = Object.assign( {}, require('./__proto__'), {
                         validate: function( val ) { return this.emailRegex.test(val) }
                     }, {
                         name: 'password',
-                        type: 'text',
+                        type: 'password',
                         error: 'Passwords must be at least 6 characters long.',
                         validate: function( val ) { return val.trim().length > 5 }
                     }, {
                         label: 'Repeat Password',
                         name: 'repeatPassword',
-                        type: 'text',
+                        type: 'password',
                         error: 'Passwords must match.',
                         validate: function( val ) { return this.els.password.val() === val }
                     } ]

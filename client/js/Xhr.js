@@ -4,10 +4,12 @@ module.exports = Object.create( Object.assign( {}, require('../../lib/MyObject')
 
         constructor( data ) {
             var req = new XMLHttpRequest(),
-                resolver
+                resolver, rejector
 
             req.onload = function() {
-                resolver(JSON.parse(this.response))
+                this.status === 500
+                    ? rejector( this.response )
+                    : resolver( JSON.parse(this.response) )
             }
 
             if( data.method === "get" ) {
@@ -17,11 +19,11 @@ module.exports = Object.create( Object.assign( {}, require('../../lib/MyObject')
                 req.send(null)
             } else {
                 req.open( data.method, `/${data.resource}`, true)
-                this.setHeaders( req data.headers )
+                this.setHeaders( req, data.headers )
                 req.send( data.data )
             }
             
-            return new Promise( resolve => resolver = resolve )
+            return new Promise( ( resolve, reject ) => { resolver = resolve; rejector = reject } )
         },
 
         plainEscape( sText ) {

@@ -8,6 +8,15 @@
             width: 6%
             text-align: right
             margin-right: 1rem
+    input
+        display: block
+        background-color: $input-borderless-bg
+        padding: $input-padding
+        border: none
+        transition: $input-transition
+        &:focus
+            background-color: #eee
+        style-placeholder()
 
 .form-input
     display: block
@@ -19,6 +28,7 @@
     transition: $input-transition
     &:focus
         box-shadow: $input-focus-box-shadow $input-focus-box-shadow-color
+    
     
 .form-label
     display: inline-block
@@ -38,15 +48,7 @@
         background-color: $input-flat-focus-bg
     style-placeholder()
         
-.input-borderless
-    display: block
-    background-color: $input-borderless-bg
-    padding: $input-padding
-    border: none
-    transition: $input-transition
-    &:focus
-        background-color: #eee
-    style-placeholder()
+
         
 .feedback
     display: block

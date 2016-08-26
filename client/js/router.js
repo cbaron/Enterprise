@@ -22,10 +22,9 @@ module.exports = new (
         goHome() { this.navigate( 'home', { trigger: true } ) },
 
         handler( resource ) {
+            var view = /verify/.test(resource) ? resource : 'home'
 
-            if( !resource ) return this.goHome()
-            
-            resource = resource.split('/').shift()
+            if( resource ) resource = resource.split('/').shift()
 
             this.User.get().then( () => {
 
@@ -35,13 +34,13 @@ module.exports = new (
                         .then( this.goHome() )
                     )
                 
-                if( this.views.home ) return this.views[ resource ].route( resource )
+                if( this.views[ view ] ) return this.views[ view ].route( resource )
                 
                 return Promise.resolve(
-                    this.views.home =
-                        this.ViewFactory.create( home, {
+                    this.views[ view ] =
+                        this.ViewFactory.create( view, {
                             insertion: { value: { $el: this.contentContainer } },
-                            resource: resource
+                            resource: { value: resource }
                         } ) )
                
             } ).catch( this.Error )

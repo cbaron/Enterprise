@@ -89,7 +89,7 @@ module.exports = Object.create(
             return Promise.resolve()
         },
 
-        hyper( request, response, path ) { return this.applyResource( request, response, path, parsedUrl, './resources/hyper', path[0] || 'index' ) },
+        hyper( request, response, path, parsedUrl ) { return this.applyResource( request, response, path, parsedUrl, './resources/hyper', path[0] || 'index' ) },
 
         resources: {
             "DELETE": [ RESTHandler ],

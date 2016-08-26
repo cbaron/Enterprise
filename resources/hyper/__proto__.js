@@ -1,6 +1,6 @@
-module.exports = Object.assign( { }, require('../lib/MyObject'), {
-    
-    Postgres: require('../dal/Postgres'),
+module.exports = Object.assign( { }, require('../../lib/MyObject'), {
+   
+    Mongo: require('../../dal/Mongo'),
 
     Validate: require('../.Validate'),
     
