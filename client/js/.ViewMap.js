@@ -8,5 +8,6 @@ module.exports={
 	Login: require('./views/Login'),
 	MyView: require('./views/MyView'),
 	Register: require('./views/Register'),
-	Verify: require('./views/Verify')
+	Verify: require('./views/Verify'),
+	ViewAction: require('./views/ViewAction')
 }

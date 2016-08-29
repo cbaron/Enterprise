@@ -34,14 +34,16 @@ module.exports = new (
                         .then( this.goHome() )
                     )
                 
-                if( this.views[ view ] ) return this.views[ view ].route( resource )
+                if( this.views[ view ] ) return this.views[ view ].navigate( resource )
                 
                 return Promise.resolve(
                     this.views[ view ] =
                         this.ViewFactory.create( view, {
                             insertion: { value: { $el: this.contentContainer } },
                             resource: { value: resource }
-                        } ) )
+                        } )
+                )
+                    
                
             } ).catch( this.Error )
             

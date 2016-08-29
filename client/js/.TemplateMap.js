@@ -9,5 +9,6 @@ module.exports={
 	list: require('./views/templates/list'),
 	login: require('./views/templates/login'),
 	register: require('./views/templates/register'),
-	verify: require('./views/templates/verify')
+	verify: require('./views/templates/verify'),
+	viewAction: require('./views/templates/viewAction')
 }

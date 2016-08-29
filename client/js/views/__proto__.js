@@ -47,7 +47,7 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
 
     events: {},
 
-    getTemplateOptions: () => ({}),
+    getTemplateOptions() { return this.model || {} },
 
     handleLogin() {
         this.factory.create( 'login', { insertion: { value: { $el: this.$('#content') } } } )
