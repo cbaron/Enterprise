@@ -16,7 +16,7 @@ module.exports = Object.create(
         applyResource( request, response, path, parsedUrl, dir, file ) {
 
             return this.P( this.FS.stat, [ `${__dirname}/${dir}/${file}.js` ] )
-            .catch( e => ( e.code !== "ENOENT" ) ? Promise.reject(e) : Promise.resolve( file = `${dir}/__proto__` ) )
+            .catch( e => ( e.code !== "ENOENT" ) ? Promise.reject(e) : Promise.resolve( file = `/__proto__` ) )
             .then( () => {
 
                 return Object.create( require(`${dir}/${file}`), {
@@ -119,24 +119,38 @@ module.exports = Object.create(
 
         static( request, response, path ) {
             var fileName = path.pop()
-                filePath = `${__dirname}/${path.join('/')}/${fileName}`
-           
+                filePath = `${__dirname}/${path.join('/')}/${fileName}`,
+                ext = this.Path.extname( filePath )
+
             return this.P( this.FS.stat, [ filePath ] )
-            .then( ( [ stat ] ) => {
+            .then( ( [ stat ] ) => new Promise( ( resolve, reject ) => {
+                
                 var stream = this.FS.createReadStream( filePath )
-                response.on( 'error', err => { console.log( err.stack || err ); stream.end() } )
+                
+                response.on( 'error', e => { stream.end(); reject(e) } )
+                stream.on( 'error', reject )
+                stream.on( 'end', () => {
+                    console.log( fileName, filePath, stat.size, stream.bytesRead )
+                    response.end();
+                    resolve()
+                } )
+
                 response.writeHead(
                     200,
                     {
                         'Connection': 'keep-alive',
-                        'Content-Encoding': this.Path.extname( filePath ) === ".gz" ? 'gzip' : 'identity',
+                        'Content-Encoding': ext === ".gz" ? 'gzip' : 'identity',
                         'Content-Length': stat.size,
-                        'Content-Type': /\.css/.test(fileName) ? 'text/css' : 'text/plain'
+                        'Content-Type':
+                            /\.css/.test(fileName)
+                                ? 'text/css'
+                                : ext === '.svg'
+                                    ? 'image/svg+xml'
+                                    : 'text/plain'
                     }
                 )
-                stream.pipe( response )
-                return Promise.resolve()
-            } )
+                stream.pipe( response, { end: false } )
+            } ) )
         }
 
     } ), { routes: { value: { REST: { auth: true, user: true, verify: true } } } }

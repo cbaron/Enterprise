@@ -98,6 +98,9 @@ button:focus {
   color: #fff;
   border: 3px solid #737373;
 }
+button.add {
+  background-image: '/static/img/plus.svg';
+}
 .example {
   width: 50%;
   background-color: #fff;

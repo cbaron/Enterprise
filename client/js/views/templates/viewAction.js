@@ -1,3 +1,3 @@
-module.exports = ( p ) => `<div>
+module.exports = p => `<div>
     <div>${p.name}</div>
 </div>`

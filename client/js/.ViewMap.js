@@ -1,5 +1,6 @@
 module.exports={
 	Admin: require('./views/Admin'),
+	CreateAction: require('./views/CreateAction'),
 	Demo: require('./views/Demo'),
 	Form: require('./views/Form'),
 	Header: require('./views/Header'),

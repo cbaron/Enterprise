@@ -39,7 +39,7 @@
     "build:vendor": "browserify -r backbone -r jquery -r moment -r underscore > static/js/vendor.js && gzip -c static/js/vendor.js > static/js/vendor.js.gz",
     "build:watch": "parallelshell 'npm run watch:css' 'npm run watch:js' 'npm run livereload'",
     "livereload": "scripts/liveReload.js",
-    "watch:css": "watch 'npm run build:css' stylus --ignoreDotFiles",
+    "watch:css": "watch 'npm run build:css' stylus --ignoreDotFiles --interval=0.5",
     "watch:js": "watch 'npm run build:js-debug' client/js --ignoreDotFiles --interval=0.5"
   },
   "version": "0.0.1"

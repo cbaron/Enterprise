@@ -2,12 +2,15 @@ module.exports = Object.assign( {}, require('./__proto__'), {
 
     Xhr: require('../Xhr'),
 
+    handleCreateAction( action ) {
+        this.views[ action.name ] = this.factory.create( 'createAction', { insertion: { value: { $el: this.els.potentialAction } }, model: { value: action } } )
+    },
+
     handleViewAction( action ) {
         this.views[ action.name ] = this.factory.create( 'viewAction', { insertion: { value: { $el: this.els.potentialAction } }, model: { value: action } } )
     },
 
     navigate( resource ) {
-
         this.resource = resource
     },
 
@@ -25,7 +28,6 @@ module.exports = Object.assign( {}, require('./__proto__'), {
     requiresLogin: true,
 
     reset() {
-        return Promise.all( Object.keys( this.views ).map( key => this.views[ key ]
     }
 
 } )

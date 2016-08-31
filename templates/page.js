@@ -1,4 +1,4 @@
-module.exports = ( p ) => `
+module.exports = p => `
 
 <!DOCTYPE html>
 <html>
@@ -9,7 +9,7 @@ module.exports = ( p ) => `
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
         ${ ( p.isDev )
-            ? '<script src="/static/js/vendor.js.gz"></script><script src="/static/js/debug.js.gz"></script>'
+            ? '<script src="/static/js/vendor.js.gz"></script>\n<script src="/static/js/debug.js.gz"></script>'
             : '<script src="/static/js/bundle.js.gz"></script>'
         }
         <title>${p.title}</title>
