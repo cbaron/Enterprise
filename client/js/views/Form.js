@@ -80,7 +80,7 @@ module.exports = Object.assign( { }, require('./__proto__'), {
     submit() {
         return this.validate()
         .then( result => result === false ? Promise.resolve( { invalid: true } ) : this.postForm() )
-        .catch( this.somethingWentWrong )
+        .catch( this.Error )
     },
 
     template: require('./templates/form'),

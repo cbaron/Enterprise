@@ -53,7 +53,7 @@ module.exports = Object.assign( {}, require('./__proto__'), {
                 this.factory.create( 'register', { insertion: { value: { $el: this.$('#content') } } } )
                 .on( 'cancelled', () => this.show() )
         } )
-        .catch( this.somethingWentWrong )
+        .catch( this.Error )
     }
 
 } )

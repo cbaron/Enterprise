@@ -118,7 +118,7 @@ module.exports = Object.create(
         rest( request, response, path, parsedUrl ) { return this.applyResource( request, response, path, parsedUrl, './resources', path[0] ) },
 
         static( request, response, path ) {
-            var fileName = path.pop()
+            var fileName = path.pop(),
                 filePath = `${__dirname}/${path.join('/')}/${fileName}`,
                 ext = this.Path.extname( filePath )
 
@@ -130,7 +130,6 @@ module.exports = Object.create(
                 response.on( 'error', e => { stream.end(); reject(e) } )
                 stream.on( 'error', reject )
                 stream.on( 'end', () => {
-                    console.log( fileName, filePath, stat.size, stream.bytesRead )
                     response.end();
                     resolve()
                 } )

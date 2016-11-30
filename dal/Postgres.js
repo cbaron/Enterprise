@@ -41,7 +41,7 @@ module.exports = Object.create( Object.assign( {}, require('../lib/MyObject').pr
         return Object.create( {
             connect() {
                 return new Promise( ( resolve, reject ) => {
-                    require('pg').connect( this.connectionString, ( err, client, done ) => {
+                    this.pool.connect( ( err, client, done ) => {
                         if( err ) return reject( err )
 
                         this.client = client
@@ -65,7 +65,7 @@ module.exports = Object.create( Object.assign( {}, require('../lib/MyObject').pr
                     } )
                 )
             },
-        }, { connectionString: { value: data.connectionString || process.env.POSTGRES } } )
+        }, { pool: { value: this.pool } } )
     },
 
     _queries: {
@@ -103,4 +103,7 @@ module.exports = Object.create( Object.assign( {}, require('../lib/MyObject').pr
         "timestamp with time zone": "DateTime",
         "text": "Text"
     }
-} ), { tables: { value: { } } } )
+} ), {
+    pool: { value: new (require('pg')).Pool() },
+    tables: { value: { } }
+} )

@@ -52,7 +52,7 @@ module.exports = Object.assign( { }, require('../../lib/MyObject'), {
                             "@context": "http://schema.org",
                             "@id": `https://${process.env.DOMAIN}:${process.env.PORT}`,
                             "@type": `ItemList`,
-                            name: this.path[1],
+                            name: this.path[0],
                             description: `A list of ${this.path[0]} Objects`,
                             potentialAction: this.potentialAction
                         }

@@ -22,7 +22,7 @@ module.exports = Object.assign( { }, proto, {
         } )
         .then( ( [ hash ] ) => Promise.resolve( this.body.password = hash ) )
         .then( () => this.Db.apply(this) )
-        .then( result => 
+        .then( result =>
             this.makeToken( { id: result.rows[0].id, email: this.body.email } )
             .then( token =>
                 this.email.send( {
@@ -40,6 +40,3 @@ module.exports = Object.assign( { }, proto, {
         .then( () => this.respond( { body: { } } ) )
     }
 } )
-
-
-

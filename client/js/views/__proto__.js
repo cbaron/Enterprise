@@ -172,9 +172,5 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
 
     requiresLogin: false,
 
-    somethingWentWrong( e ) {
-        console.log( e.stack || e )
-    },
-
     //__toDo: html.replace(/>\s+</g,'><')
 } )

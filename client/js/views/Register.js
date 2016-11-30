@@ -52,7 +52,7 @@ module.exports = Object.assign( {}, require('./__proto__'), {
             //show static, "success" modal telling them they can login once they have verified their email
             console.log('Great Job')
         } )
-        .catch( this.somethingWentWrong )
+        .catch( this.Error )
     }
     
 } )

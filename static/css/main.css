@@ -99,7 +99,13 @@ button:focus {
   border: 3px solid #737373;
 }
 button.add {
-  background-image: '/static/img/plus.svg';
+  background-image: url("/static/img/plus.svg");
+  background-repeat: no-repeat;
+  background-color: transparent;
+  border: none;
+  height: 2rem;
+  width: 2rem;
+  padding: 0px;
 }
 .example {
   width: 50%;

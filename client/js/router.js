@@ -22,7 +22,7 @@ module.exports = new (
         goHome() { this.navigate( 'home', { trigger: true } ) },
 
         handler( resource ) {
-            var view = /verify/.test(resource) ? resource : 'home'
+            var view = /verify/.test(resource) ? 'verify' : 'home'
 
             if( resource ) resource = resource.split('/').shift()
 
@@ -33,14 +33,14 @@ module.exports = new (
                         Promise.all( Object.keys( this.views ).map( name => this.views[ name ].delete() ) )
                         .then( this.goHome() )
                     )
-                
+               
                 if( this.views[ view ] ) return this.views[ view ].navigate( resource )
                 
                 return Promise.resolve(
                     this.views[ view ] =
                         this.ViewFactory.create( view, {
                             insertion: { value: { $el: this.contentContainer } },
-                            resource: { value: resource }
+                            resource: { value: resource, writable: true }
                         } )
                 )
                     
