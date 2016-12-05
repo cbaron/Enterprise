@@ -4,57 +4,89 @@ module.exports = Object.assign( { }, require('../../lib/MyObject'), {
 
     Validate: require('../.Validate'),
 
-    _addViewAction( document ) {
-        this.potentialAction.push( {
-            "@type": `ViewAction`,
-            "name": `View ${this.path[1]}`,
-            "instrument": { "description": 'Mouse', "potentialAction": { description: "click" } },
+    _addViewNavigationElements( document ) {
+        this.navigationElements.push[ {
+            "@type": `SiteNavigationElement`,
+            "name": 'div',
+            "keywords": 'resource'
+            "description": `Click to view this resource.`
+            "potentialAction": {
+                "@id": 'http://schema.org/AchieveAction',
+                "agent": `https://${process.env.DOMAIN}:${process.env.PORT}/user`,
+                "instrument": "mouse"
+            }
             "target": {
                 "actionApplication": 'Enterprise',
-                "contentType": "text/html",
-                "httpMethod": "GET",
-                "urlTemplate": `https://${process.env.DOMAIN}:${process.env.PORT}/${this.path[1]}/document._id`
-            },
-            "object": {
-                "@type": `http://schema.org/ItemList`
+                "urlTemplate": `https://${process.env.DOMAIN}:${process.env.PORT}/${this.path[0]}/document._id`
             }
-        } )
+        } ]
     },
     
     apply( method ) {
         return this.Validate.GET( this ).then( () => this.GET() )
     },
 
+    handleCreate() {
+        return this.Mongo.getDB()
+        .then( db => 
+            db.collection('Model').findOne( { name: this.path[0] } )
+            .then( model => Promise.all( model.properties.map( property => db.collection('Property').findOne( { _id: property } ) ) ) )
+        ) 
+        .then( properties =>
+            Promise.resolve(
+                this.respond( {
+                    body: {
+                        "@context": "http://www.w3.org/ns/hydra/core",
+                        "@id": `https://${process.env.DOMAIN}:${process.env.PORT}/${this.path[0]}`,
+                        "@type": "CreateAction",
+                        name: `Create ${this.path[0]}`,
+                        "method": "POST",
+                        "expects": {
+                            "@id": `http://schema.org/${this.path[0]}`,
+                            "supportedProperty": properties
+                        }
+                    }
+                } )
+            )
+        )
+    },
+
     GET() {
-        this.potentialAction = [ {
-            "@type": `CreateAction`,
-            "name": `Create ${this.path[1]}`,
-            "instrument": { "description": 'Mouse', "potentialAction": { description: "click" } },
+        if( this.path.length === 2 ) return this.handleCreate()
+
+        this.navigationElements = [ {
+            "@type": `SiteNavigationElement`,
+            "about": {
+                "@id": "http://schema.org/CreateAction",
+            }
+            "name": 'button',
+            "keywords": 'add'
+            "description": `Click to create ${this.path[0]} resources.`
+            "potentialAction": {
+                "@id": 'http://schema.org/AchieveAction',
+                "agent": `https://${process.env.DOMAIN}:${process.env.PORT}/user`,
+                "instrument": "mouse"
+            }
             "target": {
                 "actionApplication": 'Enterprise',
-                "contentType": "application/json",
-                "httpMethod": "POST",
-                "urlTemplate": `https://${process.env.DOMAIN}:${process.env.PORT}/${this.path[0]}`
-            },
-            "object": {
-                "@type": `http://schema.org/${this.path[0]}`
+                "urlTemplate": `https://${process.env.DOMAIN}:${process.env.PORT}/${this.path[0]}/Create`
             }
         } ]
 
         return this.Mongo.getDB()
         .then( db =>
-            this.Mongo.forEach( db.collection( this.path[0] ).find(), this._addViewAction, this )
+            this.Mongo.forEach( db.collection( this.path[0] ).find(), this._addViewNavigationElements, this )
             .then( () => db.close() )
             .then( () =>
                 Promise.resolve(
                     this.respond( {
                         body: { 
                             "@context": "http://schema.org",
-                            "@id": `https://${process.env.DOMAIN}:${process.env.PORT}`,
+                            "@id": `https://${process.env.DOMAIN}:${process.env.PORT}/${this.path[0]}`,
                             "@type": `ItemList`,
                             name: this.path[0],
                             description: `A list of ${this.path[0]} Objects`,
-                            potentialAction: this.potentialAction
+                            itemListElement: this.navigationElements
                         }
                     } )
                 )

@@ -1,47 +1,28 @@
 module.exports = Object.assign( {}, require('./__proto__'), {
 
-    Xhr: require('../Xhr'),
-
-    displayData(data) {
-        this.els.name.text( data.name )
-        this.els.description.text( data.description )
-        data.potentialAction.forEach( action => this[ `handle${action["@type"]}` ]( action ) )
-    },
-
     fetchAndDisplay() {
-        this.getData()
-        .then( data => this.displayData(data) )
-        .catch( this.Error )
-    },
-
-    handleCreateAction( action ) {
-        this.views[ action.name ] = this.factory.create( 'createAction', { insertion: { value: { $el: this.els.potentialAction } }, model: { value: action } } )
-    },
-
-    handleViewAction( action ) {
-        this.views[ action.name ] = this.factory.create( 'viewAction', { insertion: { value: { $el: this.els.potentialAction } }, model: { value: action } } )
+        return this.getData()
+        .then( data => {
+            this.model = data
+            this.views[ this.model["@type"] ] = this.factory.create( this.model["@type"], { insertion: { value: { $el: this.els.subView } }, model: { value: this.model } } )
+        } )
     },
 
     getData() {
-        return this.Xhr( { method: 'get', resource: this.resource || '', headers: { accept: 'application/ld+json' } } )
+        return this.Xhr( { method: 'get', resource: this.path.length ? this.path.join('/') : '', headers: { accept: 'application/ld+json' } } )
     },
 
-    navigate( resource ) {
-        this.resource = resource
-        this.reset()
-        this.fetchAndDisplay()
+    navigate( path ) {
+        this.path = path
+
+        this.views[ this.model["@type"] ].delete()
+        .then( () => this.fetchAndDisplay() )
+        .catch( this.Error )
     },
 
     postRender() {
-        this.fetchAndDisplay()
+        this.fetchAndDisplay().catch( this.Error )
         return this
-    },
-
-    requiresLogin: true,
-
-    reset() {
-        [ 'description', 'name' ].forEach( name => this.els[name].text('') )
-        this.els.potentialAction.empty()
     }
 
 } )

@@ -1,55 +1,55 @@
-module.exports = new (
-    require('backbone').Router.extend( {
+module.exports = Object.create( {
 
-        $: require('jquery'),
+    Error: require('../../lib/MyError'),
+    
+    User: require('./models/User'),
 
-        Error: require('../../lib/MyError'),
-        
-        User: require('./models/User'),
+    ViewFactory: require('./factory/View'),
 
-        ViewFactory: require('./factory/View'),
+    initialize() {
+        this.contentContainer = document.querySelector('#content')
 
-        initialize() {
+        window.onpopstate = this.onPopState()
 
-            this.contentContainer = this.$('#content')
+        return Object.assign( this, {
+            views: { },
+            header: this.ViewFactory.create( 'header', { insertion: { value: { el: this.contentContainer, method: 'insertBefore' } } } )
+        } )
+    },
 
-            return Object.assign( this, {
-                views: { },
-                header: this.ViewFactory.create( 'header', { insertion: { value: { $el: this.contentContainer, method: 'before' } } } )
-            } )
-        },
+    handler( resource ) {
+        const view = /verify/.test(resource) ? 'verify' : 'home'
+        let path = resource ? resource.split('/') : [ ]
 
-        goHome() { this.navigate( 'home', { trigger: true } ) },
+        this.User.get().then( () => {
 
-        handler( resource ) {
-            var view = /verify/.test(resource) ? 'verify' : 'home'
-
-            if( resource ) resource = resource.split('/').shift()
-
-            this.User.get().then( () => {
-
-                this.header.onUser()
-                    .on( 'signout', () => 
-                        Promise.all( Object.keys( this.views ).map( name => this.views[ name ].delete() ) )
-                        .then( this.goHome() )
-                    )
-               
-                if( this.views[ view ] ) return this.views[ view ].navigate( resource )
-                
-                return Promise.resolve(
-                    this.views[ view ] =
-                        this.ViewFactory.create( view, {
-                            insertion: { value: { $el: this.contentContainer } },
-                            resource: { value: resource, writable: true }
-                        } )
+            this.header.onUser()
+                .on( 'signout', () => 
+                    Promise.all( Object.keys( this.views ).map( name => this.views[ name ].delete() ) )
+                    .then( () => this.navigate( 'home' ) )
                 )
-                    
-               
-            } ).catch( this.Error )
+           
+            if( this.views[ view ] ) return this.views[ view ].navigate( path )
             
-        },
+            return Promise.resolve(
+                this.views[ view ] =
+                    this.ViewFactory.create( view, {
+                        insertion: { value: { $el: this.contentContainer } },
+                        path: { value: path, writable: true }
+                    } )
+            )
+                
+           
+        } ).catch( this.Error )
+        
+    },
 
-        routes: { '(*request)': 'handler' }
+    navigate( location ) {
+        History.pushState( {}, '', location )
+    },
 
-    } )
-)()
+    onPopState() {
+        this.handler( window.location.split('/').slice(3) )
+    }
+
+} )

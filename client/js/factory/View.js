@@ -10,7 +10,7 @@ module.exports = Object.create( {
                 user: { value: this.User }
                 }, opts )
         ).constructor()
-        .on( 'navigate', route => require('../router').navigate( route, { trigger: true } ) )
+        .on( 'navigate', route => require('../router').navigate( route ) )
     },
 
 }, {

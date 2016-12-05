@@ -7,7 +7,7 @@ module.exports = Object.create( {
     },
 
     GET( resource ) {
-        if( resource.path.length > 1 && Number.isNaN( parseInt( resource.path[1], 10 ) ) ) this.throwInvalid()
+        if( /application\/json/.test( resource.request.headers.accept ) && resource.path.length > 1 && Number.isNaN( parseInt( resource.path[1], 10 ) ) ) this.throwInvalid()
         
         return this.parseSignature( resource, this.parseCookies( resource.request.headers.cookie ) )
         .then( () =>

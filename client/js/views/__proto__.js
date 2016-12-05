@@ -2,21 +2,24 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
 
     _: require('underscore'),
 
-    $: require('jquery'),
-
     Collection: require('backbone').Collection,
     
     Model: require('backbone').Model,
 
-    bindEvent( key, event, selector='' ) {
-        this.els[key].on( 'click', selector, e => this[ `on${this.capitalizeFirstLetter(key)}${this.capitalizeFirstLetter(event)}` ]( e ) )
+    OptimizedResize: reqiuire('.lib/OptimizedResize'),
+    
+    Xhr: require('../Xhr'),
+
+    bindEvent( key, event ) {
+        var els = Array.isArray( this.els[ key ] ) ? this.els[ key ] : [ this.els[ key ] ]
+        els.forEach( el => el.addEventListener( event || 'click', e => this[ `on${this.capitalizeFirstLetter(key)}${this.capitalizeFirstLetter(event)}` ]( e ) ) )
     },
 
     capitalizeFirstLetter: string => string.charAt(0).toUpperCase() + string.slice(1),
 
     constructor() {
 
-        if( this.size ) this.$(window).resize( this._.throttle( () => this.size(), 500 ) )
+        if( this.size ) this.OptimizedResize.add( this.size );
 
         if( this.requiresLogin && (!this.user.data || !this.user.data.id ) ) return this.handleLogin()
 
@@ -50,7 +53,7 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
     getTemplateOptions() { return this.model || {} },
 
     handleLogin() {
-        this.factory.create( 'login', { insertion: { value: { $el: this.$('#content') } } } )
+        this.factory.create( 'login', { insertion: { value: { el: document.querySelector('#content') } } } )
             .once( "loggedIn", () => this.onLogin() )
 
         return this
@@ -62,6 +65,13 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
 
     hide( duration ) {
         return new Promise( resolve => this.els.container.hide( duration || 10, resolve ) )
+    },
+
+    htmlToFragment( str ) {
+        let range = document.createRange();
+        // make the parent of the first div in the document becomes the context node
+        range.selectNode(document.getElementsByTagName("div").item(0))
+        return range.createContextualFragment( str )
     },
     
     isHidden() { return this.els.container.css('display') === 'none' },
@@ -99,7 +109,7 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
                         : opts()
                     : {}
 
-                this.views[ key ] = this.factory.create( key, Object.assign( { insertion: { value: { $el: this.Views[ key ].el, method: 'before' } } }, opts ) )
+                this.views[ key ] = this.factory.create( key, Object.assign( { insertion: { value: { el: this.Views[ key ].el, method: 'before' } } }, opts ) )
                 this.Views[ key ].el.remove()
                 this.Views[ key ].el = undefined
             }
@@ -122,33 +132,31 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
 
         if( key === 'container' ) el.addClass( this.name )
 
-        this.els[ key ] = this.els[ key ] ? this.els[ key ].add( el ) : el
+        this.els[ key ] = Array.isArray( this.els[ key ] )
+            ? this.els[ key ].push( el )
+            : ( this.els[ key ] !== undefined )
+                ? [ this.els[ key ], el ]
+                : el
 
-        el.removeAttr(this.slurp.attr)
+        el.removeAttribute(this.slurp.attr)
 
         if( this.events[ key ] ) this.delegateEvents( key, el )
     },
-
+]
     slurpTemplate( options ) {
 
-        var $html = this.$( options.template ),
+        var fragment = this.htmlToFragment( options.template ),
             selector = `[${this.slurp.attr}]`,
             viewSelector = `[${this.slurp.view}]`
 
-        $html.each( ( i, el ) => {
-            var $el = this.$(el);
-            if( $el.is( selector ) || i === 0 ) this.slurpEl( $el )
-        } )
-
-        $html.get().forEach( ( el ) => {
-            this.$( el ).find( selector ).each( ( undefined, elToBeSlurped ) => this.slurpEl( this.$(elToBeSlurped) ) )
-            this.$( el ).find( viewSelector ).each( ( undefined, viewEl ) => {
-                var $el = this.$(viewEl)
-                this.Views[ $el.attr(this.slurp.view) ].el = $el
-            } )
-        } )
-       
-        options.insertion.$el[ options.insertion.method || 'append' ]( $html )
+        fragment.firstChild( el => this.slurpEl( el ) )
+        fragment.querySelectorAll( selector, viewSelector ).forEach( el =>
+            ( el.hasAttribute( this.slurp.attr ) ) 
+                ? this.slurpEl( el )
+                : this.Views[ el.getAttribute(this.slurp.view) ].el = el
+        )
+            
+        options.insertion.el[ options.insertion.method || 'appendChild' ]( fragment )
 
         return this
     },
@@ -170,7 +178,7 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
         return true
     },
 
-    requiresLogin: false,
+    requiresLogin: true,
 
     //__toDo: html.replace(/>\s+</g,'><')
 } )

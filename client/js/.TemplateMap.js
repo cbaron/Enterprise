@@ -1,6 +1,10 @@
 module.exports={
+	CreateAction: require('./views/templates/CreateAction'),
+	Input: require('./views/templates/Input'),
+	ItemList: require('./views/templates/ItemList'),
+	SiteNavigationElement: require('./views/templates/SiteNavigationElement'),
+	Thing: require('./views/templates/Thing'),
 	admin: require('./views/templates/admin'),
-	createAction: require('./views/templates/createAction'),
 	demo: require('./views/templates/demo'),
 	fieldError: require('./views/templates/fieldError'),
 	form: require('./views/templates/form'),
