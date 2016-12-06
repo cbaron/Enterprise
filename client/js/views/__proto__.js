@@ -1,12 +1,8 @@
 module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('events').EventEmitter.prototype, {
 
-    _: require('underscore'),
+    Model: require('../models/__proto__.js'),
 
-    Collection: require('backbone').Collection,
-    
-    Model: require('backbone').Model,
-
-    OptimizedResize: reqiuire('.lib/OptimizedResize'),
+    OptimizedResize: require('./lib/OptimizedResize'),
     
     Xhr: require('../Xhr'),
 
@@ -40,17 +36,18 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
     },
 
     delete( duration ) {
-        return this.hide( duration )
-        .then( () => {
-            this.else.container.remove()
-            this.emit("removed")
-            return Promise.resolve()
+        return new Promise( resolve => {
+            this.els.container.classList.add('hide')
+            this.els.container.addEventListener( 'transitionend', e => {
+                this.els.container.parentNode.removeChild( this.els.container );
+                resolve( this.emit('removed') )
+            }, true )
         } )
     },
 
     events: {},
 
-    getTemplateOptions() { return this.model || {} },
+    getTemplateOptions() { return (this.model) ? this.model.data : {} },
 
     handleLogin() {
         this.factory.create( 'login', { insertion: { value: { el: document.querySelector('#content') } } } )
@@ -61,10 +58,6 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
 
     hasPrivilege() {
         ( this.requiresRole && ( this.user.get('roles').find( role => role === this.requiresRole ) === "undefined" ) ) ? false : true
-    },
-
-    hide( duration ) {
-        return new Promise( resolve => this.els.container.hide( duration || 10, resolve ) )
     },
 
     htmlToFragment( str ) {
@@ -109,7 +102,7 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
                         : opts()
                     : {}
 
-                this.views[ key ] = this.factory.create( key, Object.assign( { insertion: { value: { el: this.Views[ key ].el, method: 'before' } } }, opts ) )
+                this.views[ key ] = this.factory.create( key, Object.assign( { insertion: { value: { el: this.Views[ key ].el, method: 'insertBefore' } } }, opts ) )
                 this.Views[ key ].el.remove()
                 this.Views[ key ].el = undefined
             }
@@ -128,9 +121,9 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
     },
 
     slurpEl( el ) {
-        var key = el.attr( this.slurp.attr ) || 'container'
+        var key = el.getAttribute( this.slurp.attr ) || 'container'
 
-        if( key === 'container' ) el.addClass( this.name )
+        if( key === 'container' ) el.classList.add( this.name )
 
         this.els[ key ] = Array.isArray( this.els[ key ] )
             ? this.els[ key ].push( el )
@@ -142,21 +135,22 @@ module.exports = Object.assign( { }, require('../../../lib/MyObject'), require('
 
         if( this.events[ key ] ) this.delegateEvents( key, el )
     },
-]
-    slurpTemplate( options ) {
 
+    slurpTemplate( options ) {
         var fragment = this.htmlToFragment( options.template ),
             selector = `[${this.slurp.attr}]`,
             viewSelector = `[${this.slurp.view}]`
 
-        fragment.firstChild( el => this.slurpEl( el ) )
-        fragment.querySelectorAll( selector, viewSelector ).forEach( el =>
+        this.slurpEl( fragment.querySelector('*') )
+        fragment.querySelectorAll( `${selector}, ${viewSelector}` ).forEach( el =>
             ( el.hasAttribute( this.slurp.attr ) ) 
                 ? this.slurpEl( el )
                 : this.Views[ el.getAttribute(this.slurp.view) ].el = el
         )
-            
-        options.insertion.el[ options.insertion.method || 'appendChild' ]( fragment )
+          
+        options.insertion.method === 'insertBefore'
+            ? options.insertion.el.parentNode.insertBefore( fragment, options.insertion.el )
+            : options.insertion.el[ options.insertion.method || 'appendChild' ]( fragment )
 
         return this
     },

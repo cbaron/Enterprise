@@ -55,6 +55,10 @@ button:focus {
 #content {
   padding-top: 1rem;
 }
+.hide {
+  opacity: 0;
+  transition: all 1s ease-in-out;
+}
 .btn-default {
   display: inline-block;
   padding: 0.5rem 1rem;

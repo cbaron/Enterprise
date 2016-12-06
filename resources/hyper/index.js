@@ -1,43 +1,36 @@
 module.exports = Object.assign( { }, require('./__proto__'), {
 
     GET() {
-        this.potentialAction = [ ]
-
-        return this.Mongo.getDB()
-        .then( db =>
-            this.Mongo.forEach( db.listCollections( { name: { $ne: 'system.indexes' } } ), this.addViewAction, this )
-            .then( () => db.close() )
-            .then( () =>
-                Promise.resolve(
-                    this.respond( {
-                        body: { 
-                            "@context": "http://schema.org",
-                            "@id": `https://${process.env.DOMAIN}:${process.env.PORT}`,
-                            "@type": `ItemList`,
-                            name: "Home",
-                            description: "A list of resources",
-                            potentialAction: this.potentialAction
-                        }
-                    } )
-                )
-            )
+        Promise.resolve(
+            this.respond( {
+                body: { 
+                    "@context": "http://schema.org",
+                    "@id": `https://${process.env.DOMAIN}:${process.env.PORT}`,
+                    "@type": `ItemList`,
+                    name: "Home",
+                    description: "A list of resources",
+                    itemListElement: Object.keys( this.Mongo.collections ).map( collection => this.addNavigationElement( collection ) )
+                }
+            } )
         )
     },
 
-    addViewAction( collection ) {
-        this.potentialAction.push( {
-            "@type": `ViewAction`,
-            "name": collection.name,
-            "instrument": { "description": 'Mouse', "potentialAction": { description: "click" } },
+    addNavigationElement( collection ) {
+        return {
+            "@type": `SiteNavigationElement`,
+            "name": 'div',
+            "keywords": 'collection',
+            "description": `${collection.name}`,
+            "about": `Click to manage this resource.`,
+            "potentialAction": {
+                "@id": 'http://schema.org/AchieveAction',
+                "agent": `https://${process.env.DOMAIN}:${process.env.PORT}/user`,
+                "instrument": "mouse"
+            },
             "target": {
                 "actionApplication": 'Enterprise',
-                "contentType": "text/html",
-                "httpMethod": "GET",
                 "urlTemplate": `https://${process.env.DOMAIN}:${process.env.PORT}/${collection.name}`
-            },
-            "object": {
-                "@type": `http://schema.org/ItemList`
             }
-        } )
+        } 
     }
 } )

@@ -50,10 +50,12 @@ module.exports = Object.assign( {}, require('./__proto__'), {
         .then( () => {
             if( this.views.register ) return this.views.register.show()
             this.views.register =
-                this.factory.create( 'register', { insertion: { value: { $el: this.$('#content') } } } )
+                this.factory.create( 'register', { insertion: { value: { el: document.querySelector('#content') } } } )
                 .on( 'cancelled', () => this.show() )
         } )
         .catch( this.Error )
-    }
+    },
+
+    requiresLogin: false
 
 } )

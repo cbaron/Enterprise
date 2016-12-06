@@ -2,20 +2,23 @@ module.exports = Object.assign( {}, require('./__proto__'), {
 
     fetchAndDisplay() {
         return this.getData()
-        .then( data => {
-            this.model = data
-            this.views[ this.model["@type"] ] = this.factory.create( this.model["@type"], { insertion: { value: { $el: this.els.subView } }, model: { value: this.model } } )
-        } )
+        .then( () => 
+            this.views[ this.model.data["@type"] ] =
+                this.factory.create( this.model.data["@type"], { insertion: { value: { el: this.els.subView } }, model: { value: this.model } } )
+        )
     },
 
     getData() {
-        return this.Xhr( { method: 'get', resource: this.path.length ? this.path.join('/') : '', headers: { accept: 'application/ld+json' } } )
+        if( !this.model ) this.model = Object.create( this.Model )
+
+        this.model.resource = this.path.length ? this.path.join('/') : ''
+        return this.model.get()
     },
 
     navigate( path ) {
-        this.path = path
+        this.path = path;
 
-        this.views[ this.model["@type"] ].delete()
+        ( this.model ? this.views[ this.model.data["@type"] ].delete() : Promise.resolve() )
         .then( () => this.fetchAndDisplay() )
         .catch( this.Error )
     },

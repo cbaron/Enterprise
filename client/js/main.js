@@ -1,2 +1,4 @@
-require('./.env')
-require('./router').initialize()
+window.onload = () => {
+    require('./.env')
+    require('./router').initialize()
+}

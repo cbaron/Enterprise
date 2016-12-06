@@ -8,7 +8,7 @@ module.exports = Object.assign( {}, require('./__proto__'), {
     },
 
     postRender() {
-        this.model.supportedProperty.forEach( property => this.factory.create( 'Input', { insertion: { value: { $el: this.submitBtn, method: 'before' } }, model: { value: property } } ) )
+        this.model.data.expects.supportedProperty.forEach( property => this.factory.create( 'Input', { insertion: { value: { el: this.els.submitBtn, method: 'insertBefore' } }, model: { value: { data: property } } } ) )
         return this
     }
 } )

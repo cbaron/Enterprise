@@ -1,12 +1,14 @@
 module.exports = Object.assign( {}, require('./__proto__'), {
 
     events: {
-        signoutBtn: { method: 'signout' }
+        signoutBtn: 'click'
     },
 
     onUser() {
         return this
     },
+
+    requiresLogin: false,
     
     signout() {
 

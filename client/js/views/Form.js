@@ -18,10 +18,10 @@ module.exports = Object.assign( { }, require('./__proto__'), {
     },
 
     getFormData() {
-        var data = { }
+        let data = { }
 
         Object.keys( this.els ).forEach( key => {
-            if( /INPUT|TEXTAREA|SELECT/.test( this.els[ key ].prop("tagName") ) ) data[ key ] = this.els[ key ].val()
+            if( /INPUT|TEXTAREA|SELECT/.test( this.els[ key ].tagName ) ) data[ key ] = this.els[ key ].value
         } )
 
         return data
@@ -45,36 +45,51 @@ module.exports = Object.assign( { }, require('./__proto__'), {
     postRender() {
 
         this.fields.forEach( field => {
-            var $el = this.els[ field.name ]
-            $el.on( 'blur', () => {
-                var rv = field.validate.call( this, $el.val() )
-                if( typeof rv === "boolean" ) return rv ? this.showValid($el) : this.showError( $el, field.error )
-                rv.then( () => this.showValid($el) )
-                 .catch( () => this.showError( $el, field.error ) )
+            var el = this.els[ field.name ]
+            el.addEventListener( 'blur', () => {
+                var rv = field.validate.call( this, el.value )
+                if( typeof rv === "boolean" ) return rv ? this.showValid(el) : this.showError( el, field.error )
+                rv.then( () => this.showValid( el ) )
+                 .catch( () => this.showError( el, field.error ) )
              } )
-            .on( 'focus', () => this.removeError( $el ) )
+            el.addEventListener( 'focus', () => this.removeError( el ) )
         } )
 
         return this
     },
 
-    removeError( $el ) {
-        $el.parent().removeClass('error valid')
-        $el.siblings('.feedback').remove()
+    removeError( el ) {
+        el.parentNode.classList.remove( 'error', 'valid')
+
+        this.removeFeedback(el)
     },
 
-    showError( $el, error ) {
+    removeFeedback(el) {
+        let nextSibling = el.nextSibling
 
-        var formGroup = $el.parent()
-
-        if( formGroup.hasClass( 'error' ) ) return
-
-        formGroup.removeClass('valid').addClass('error').append( this.templates.fieldError( { error: error } ) )
+        while( nextSibling !== null ) {
+            ( nextSibling.nodeType !== 1 || !nextSibling.classList.contains('feedback') ) 
+                ? nextSibling = nextSibling.nextSibling
+                : (() => { el.parentNode.removeChild( nextSibling ); nextSibling = null })()
+        }
     },
 
-    showValid( $el ) {
-        $el.parent().removeClass('error').addClass('valid')
-        $el.siblings('.feedback').remove()
+    requiresLogin: false,
+
+    showError( el, error ) {
+        const formGroup = el.parentNode
+
+        if( formGroup.classList.contains( 'error' ) ) return
+
+        formGroup.classList.remove('valid')
+        formGroup.classList.add('error')
+        formGroup.appendChild( this.htmlToFragment( this.templates.fieldError( { error: error } ) ) )
+    },
+
+    showValid( el ) {
+        el.parentNode.classList.remove('error')
+        el.parentNode.classList.add('valid')
+        this.removeFeedback(el)
     },
 
     submit() {
@@ -94,14 +109,14 @@ module.exports = Object.assign( { }, require('./__proto__'), {
             promises = [ ]
                 
         this.fields.forEach( field => {
-            var $el = this.els[ field.name ],
-                rv = field.validate.call( this, $el.val() )
+            var el = this.els[ field.name ],
+                rv = field.validate.call( this, el.value )
             if( typeof rv === "boolean" ) {
-                if( rv ) { this.showValid($el) } else { this.showError( $el, field.error ); valid = false }
+                if( rv ) { this.showValid(el) } else { this.showError( el, field.error ); valid = false }
             } else {
                 promises.push(
-                    rv.then( () => Promise.resolve( this.showValid($el) ) )
-                     .catch( () => { this.showError( $el, field.error ); return Promise.resolve( valid = false ) } )
+                    rv.then( () => Promise.resolve( this.showValid(el) ) )
+                     .catch( () => { this.showError( el, field.error ); return Promise.resolve( valid = false ) } )
                 )
             }
         } )

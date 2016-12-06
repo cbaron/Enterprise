@@ -1,7 +1,9 @@
 module.exports={
 	Admin: require('./views/Admin'),
 	CreateAction: require('./views/CreateAction'),
+	DateTime: require('./views/DateTime'),
 	Demo: require('./views/Demo'),
+	Dropdown: require('./views/Dropdown'),
 	Form: require('./views/Form'),
 	Header: require('./views/Header'),
 	Home: require('./views/Home'),
@@ -10,8 +12,10 @@ module.exports={
 	List: require('./views/List'),
 	Login: require('./views/Login'),
 	MyView: require('./views/MyView'),
+	Number: require('./views/Number'),
 	Register: require('./views/Register'),
 	SiteNavigationElement: require('./views/SiteNavigationElement'),
+	Typeahead: require('./views/Typeahead'),
 	Verify: require('./views/Verify'),
 	ViewAction: require('./views/ViewAction')
 }

@@ -9,6 +9,8 @@ module.exports = Object.create(
 
         FS: require('fs'),
 
+        Mongo: require('./dal/Mongo'),
+
         Path: require('path'),
 
         Postgres: require('./dal/Postgres'),
@@ -33,6 +35,7 @@ module.exports = Object.create(
         constructor() {
             this.isDev = ( process.env.ENV === 'development' )
             this.Postgres.getTableData()
+            this.Mongo.getCollectionData()
 
             return this.handler.bind(this)
         },
@@ -107,6 +110,13 @@ module.exports = Object.create(
                 },
                 RESTHandler
             ],
+
+            "OPTIONS": [
+                {
+                    condition: ( request, path ) => /application\/ld\+json/.test( request.headers.accept ),
+                    method: 'hyper'
+                }
+            ]
             
             "PATCH": [ RESTHandler ],
 

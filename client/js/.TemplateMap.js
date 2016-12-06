@@ -1,9 +1,13 @@
 module.exports={
 	CreateAction: require('./views/templates/CreateAction'),
+	DateTime: require('./views/templates/DateTime'),
+	Dropdown: require('./views/templates/Dropdown'),
 	Input: require('./views/templates/Input'),
 	ItemList: require('./views/templates/ItemList'),
+	Number: require('./views/templates/Number'),
 	SiteNavigationElement: require('./views/templates/SiteNavigationElement'),
 	Thing: require('./views/templates/Thing'),
+	Typeahead: require('./views/templates/Typeahead'),
 	admin: require('./views/templates/admin'),
 	demo: require('./views/templates/demo'),
 	fieldError: require('./views/templates/fieldError'),

@@ -20,4 +20,4 @@ module.exports = Object.create( {
         this.running = false 
     }
 
-}, { callbacks: { value: [] }, running: { value: false } ).add
+}, { callbacks: { value: [] }, running: { value: false } } ).add

@@ -5,9 +5,7 @@ module.exports = Object.assign( {}, require('./__proto__'), {
     },
 
     onContainerClick() {
-        var path = this.model.target.urlTemplate.split('/')
-        path.shift(); path.shift();
-        this.emit( 'navigate', path )
+        this.emit( 'navigate', this.model.data.target.urlTemplate.split('/').slice(3).join('/') )
     }
 
 } )

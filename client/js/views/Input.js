@@ -4,16 +4,23 @@ module.exports = Object.assign( {}, require('./__proto__'), {
         submitBtn: 'click'
     },
 
-    insertTypeahead() {
-        this.els.input.
-    },
-
     onSubmitBtnClick() {
     },
 
     postRender() {
-        if( Array.isArray(this.model.range) || this.supportedRanges[ this.model.range ] === undefined ) this.insertTypeahead()
-        this.model.supportedProperty.forEach( property => this.factory.create( 'Input', { insertion: { value: { $el: this.submitBtn, method: 'before' } }, model: { value: property } } ) )
+        const view =     
+            ( /^ISO /.test(this.model.data.range) )
+                ? 'Dropdown'
+                : ( Array.isArray(this.model.data.range) || !this.supportedRanges.includes( this.model.data.range ) )
+                    ? 'Typeahead'
+                    : this.model.data.range
+        
+        this.subView = this.factory.create( view, { insertion: { value: { el: this.els.inputContainer } }, model: { value: this.model } } )
         return this
-    }
+    },
+
+    supportedRanges: [
+        'DateTime',
+        'Number'
+    ]
 } )
